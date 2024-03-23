@@ -10,3 +10,16 @@
   <p>Hello, World!</p>
 </body>
 </html>
+
+<p>다크 모드</p>
+<button id='mode-toggle-button'>모드 전환</button>
+body.dark {
+  background: #000000;
+}
+
+body.dark p {
+  color: #EDEDED;
+}
+document.getElementById('mode-toggle-button').addEventListener('click', () => {
+  document.body.classList.add('dark');
+});
