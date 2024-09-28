@@ -1,25 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Portfolio</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../css/day11.css">
 </head>
 <body>
-  <p>Hello, World!</p>
+    <section>
+        <form action="https://search.naver.com/search.naver">
+            <div class="search">
+                <input type="text" name="query" value="">
+                <button type="submit">검색</button>
+            </div>
+        </form>
+    </section>
 </body>
 </html>
-
-<p>다크 모드</p>
-<button id='mode-toggle-button'>모드 전환</button>
-body.dark {
-  background: #000000;
-}
-
-body.dark p {
-  color: #EDEDED;
-}
-document.getElementById('mode-toggle-button').addEventListener('click', () => {
-  document.body.classList.add('dark');
-});
