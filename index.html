@@ -1,4 +1,2263 @@
-<div class="search">
-  <input type="text" placeholder="검색어 입력">
-  <img src="https://s3.ap-northeast-2.amazonaws.com/cdn.wecode.co.kr/icon/search.png">
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blossom SNS</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #DB3768;
+  --primary-dark: #b52d55;
+  --primary-light: #f06292;
+  --primary-ultra-light: #fce4ec;
+  --bg: #fff8f9;
+  --surface: #ffffff;
+  --surface2: #fff0f4;
+  --border: #f8cdd8;
+  --text: #1a0a10;
+  --text-muted: #8a5566;
+  --text-light: #c49aaa;
+  --danger: #e53935;
+  --success: #43a047;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 4px 24px rgba(219,55,104,0.10);
+  --shadow-lg: 0 8px 40px rgba(219,55,104,0.18);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--primary-light); border-radius: 3px; }
+
+/* ═══════════════════════════════════════
+   AUTH SCREENS
+═══════════════════════════════════════ */
+#auth-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #fff0f4 0%, #fce4ec 50%, #f8bbd0 100%);
+  position: relative;
+  overflow: hidden;
+}
+#auth-screen::before {
+  content: '';
+  position: absolute;
+  width: 600px; height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(219,55,104,0.15) 0%, transparent 70%);
+  top: -150px; right: -150px;
+  pointer-events: none;
+}
+#auth-screen::after {
+  content: '';
+  position: absolute;
+  width: 400px; height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(219,55,104,0.10) 0%, transparent 70%);
+  bottom: -100px; left: -100px;
+  pointer-events: none;
+}
+
+.auth-card {
+  background: white;
+  border-radius: 28px;
+  padding: 48px 44px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  z-index: 1;
+  animation: fadeUp 0.5s ease;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.auth-logo {
+  text-align: center;
+  margin-bottom: 32px;
+}
+.auth-logo .logo-img {
+  width: 70px; height: 70px;
+  object-fit: contain;
+  display: none;
+}
+.auth-logo .logo-text {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.4rem;
+  color: var(--primary);
+  font-weight: 700;
+  letter-spacing: -1px;
+  display: block;
+}
+.auth-logo .logo-sub {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--surface2);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  margin-bottom: 28px;
+}
+.auth-tab {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.25s;
+}
+.auth-tab.active {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 2px 12px rgba(219,55,104,0.3);
+}
+
+.form-group { margin-bottom: 16px; }
+.form-label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.form-input {
+  width: 100%;
+  padding: 13px 16px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--text);
+  background: var(--bg);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(219,55,104,0.10);
+}
+.form-input::placeholder { color: var(--text-light); }
+
+.btn-primary {
+  width: 100%;
+  padding: 14px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 4px 16px rgba(219,55,104,0.3);
+}
+.btn-primary:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(219,55,104,0.4);
+}
+.btn-primary:active { transform: translateY(0); }
+
+.error-msg {
+  background: #fff0f0;
+  border: 1px solid #ffcdd2;
+  color: var(--danger);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  margin-bottom: 14px;
+  display: none;
+}
+.error-msg.show { display: block; }
+
+/* ═══════════════════════════════════════
+   APP LAYOUT
+═══════════════════════════════════════ */
+#app-screen { display: none; min-height: 100vh; flex-direction: column; }
+#app-screen.active { display: flex; }
+
+.main-content {
+  flex: 1;
+  padding: 16px 16px 80px;
+  max-width: 600px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ── TOP BAR ── */
+.top-bar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.top-bar-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  color: var(--primary);
+  font-weight: 700;
+}
+.top-bar-logo img { height: 36px; display: none; }
+.top-bar-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 200;
+  background: rgba(255,255,255,0.97);
+  backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border);
+  display: flex;
+  padding: 8px 0 env(safe-area-inset-bottom);
+}
+.nav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 8px 4px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.2s;
+  color: var(--text-light);
+}
+.nav-btn.active { color: var(--primary); }
+.nav-btn svg { width: 24px; height: 24px; }
+.nav-btn span { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.3px; }
+.nav-badge {
+  position: absolute;
+  top: 4px; right: calc(50% - 18px);
+  background: var(--primary);
+  color: white;
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 10px;
+  min-width: 16px;
+  text-align: center;
+}
+
+/* ── PAGE ── */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ═══════════════════════════════════════
+   STORY BAR (팔로우 프로필)
+═══════════════════════════════════════ */
+.stories-section {
+  overflow-x: auto;
+  display: flex;
+  gap: 12px;
+  padding: 12px 0 8px;
+  scrollbar-width: none;
+  margin-bottom: 8px;
+}
+.stories-section::-webkit-scrollbar { display: none; }
+
+.story-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  flex-shrink: 0;
+  min-width: 64px;
+}
+.story-ring {
+  width: 58px; height: 58px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  padding: 3px;
+  transition: transform 0.2s;
+}
+.story-ring:hover { transform: scale(1.08); }
+.story-avatar {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: 2px solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+.story-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.story-name {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  text-align: center;
+  max-width: 64px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ═══════════════════════════════════════
+   POST CARDS
+═══════════════════════════════════════ */
+.post-card {
+  background: white;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  margin-bottom: 14px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  animation: fadeUp 0.35s ease;
+}
+.post-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px 10px;
+}
+.post-avatar {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: var(--surface2);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; color: var(--primary);
+  font-size: 1rem;
+  overflow: hidden;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.post-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.post-meta { flex: 1; }
+.post-nick {
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--text);
+  cursor: pointer;
+}
+.post-nick:hover { color: var(--primary); }
+.post-date { font-size: 0.75rem; color: var(--text-light); margin-top: 1px; }
+.post-more-btn {
+  background: none; border: none; cursor: pointer;
+  color: var(--text-light); padding: 4px; border-radius: 6px;
+  transition: background 0.2s;
+  font-size: 1.2rem;
+  position: relative;
+}
+.post-more-btn:hover { background: var(--surface2); color: var(--primary); }
+
+.post-body { padding: 0 16px 10px; }
+.post-text {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.post-deleted {
+  color: var(--danger) !important;
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+.post-images {
+  display: grid;
+  gap: 4px;
+  padding: 0 0 10px;
+}
+.post-images.one { grid-template-columns: 1fr; }
+.post-images.two { grid-template-columns: 1fr 1fr; }
+.post-images img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.post-images img:hover { opacity: 0.9; }
+
+.post-actions {
+  display: flex;
+  border-top: 1px solid var(--border);
+  padding: 4px 8px;
+}
+.action-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 9px 4px;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  transition: all 0.2s;
+}
+.action-btn:hover { background: var(--surface2); color: var(--primary); }
+.action-btn.liked { color: var(--primary); }
+.action-btn.disliked { color: #6666cc; }
+.action-btn.retweeted { color: var(--success); }
+.action-btn svg { width: 18px; height: 18px; }
+
+/* ═══════════════════════════════════════
+   COMMENTS
+═══════════════════════════════════════ */
+.comments-section {
+  border-top: 1px solid var(--border);
+  padding: 10px 14px;
+  background: #fafafa;
+}
+.comment-input-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.comment-input {
+  flex: 1;
+  padding: 9px 13px;
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  color: var(--text);
+  background: white;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.comment-input:focus { border-color: var(--primary); }
+.comment-submit {
+  padding: 9px 16px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.comment-submit:hover { background: var(--primary-dark); }
+
+.comment-item {
+  background: white;
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  border: 1px solid var(--border);
+  animation: fadeUp 0.2s ease;
+}
+.comment-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+.comment-avatar {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--surface2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; font-weight: 700; color: var(--primary);
+  overflow: hidden;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.comment-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.comment-nick {
+  font-weight: 700; font-size: 0.83rem; color: var(--text);
+  cursor: pointer;
+}
+.comment-nick:hover { color: var(--primary); }
+.comment-date { font-size: 0.7rem; color: var(--text-light); margin-left: auto; }
+.comment-text { font-size: 0.85rem; color: var(--text); line-height: 1.5; white-space: pre-wrap; }
+.comment-actions { display: flex; gap: 6px; margin-top: 6px; }
+.comment-action-btn {
+  display: flex; align-items: center; gap: 3px;
+  background: none; border: none; cursor: pointer;
+  font-size: 0.75rem; color: var(--text-light);
+  padding: 3px 7px; border-radius: 6px;
+  transition: all 0.2s; font-family: inherit;
+}
+.comment-action-btn:hover { background: var(--surface2); color: var(--primary); }
+.comment-action-btn.liked { color: var(--primary); }
+.comment-action-btn.disliked { color: #6666cc; }
+.comment-action-btn svg { width: 13px; height: 13px; }
+
+/* ═══════════════════════════════════════
+   UPLOAD PAGE
+═══════════════════════════════════════ */
+.upload-card {
+  background: white;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 24px 20px;
+  box-shadow: var(--shadow);
+}
+.upload-card h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 20px;
+}
+.char-count {
+  text-align: right;
+  font-size: 0.78rem;
+  color: var(--text-light);
+  margin-top: 5px;
+}
+.char-count.near { color: #f59e0b; }
+.char-count.over { color: var(--danger); }
+.upload-textarea {
+  width: 100%;
+  padding: 13px 16px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--text);
+  resize: none;
+  height: 120px;
+  outline: none;
+  transition: border-color 0.2s;
+  background: var(--bg);
+}
+.upload-textarea:focus { border-color: var(--primary); }
+
+.img-upload-area {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-sm);
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin: 14px 0;
+  position: relative;
+}
+.img-upload-area:hover { border-color: var(--primary); background: var(--surface2); }
+.img-upload-area input[type=file] {
+  position: absolute; inset: 0; opacity: 0; cursor: pointer;
+}
+.img-upload-area p { color: var(--text-muted); font-size: 0.88rem; }
+.img-upload-area svg { color: var(--primary); margin-bottom: 6px; }
+
+.preview-imgs {
+  display: flex;
+  gap: 8px;
+  margin: 10px 0;
+  flex-wrap: wrap;
+}
+.preview-img-wrap {
+  position: relative;
+  width: 80px; height: 80px;
+}
+.preview-img-wrap img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid var(--border);
+}
+.preview-remove {
+  position: absolute;
+  top: -6px; right: -6px;
+  width: 20px; height: 20px;
+  background: var(--danger);
+  color: white;
+  border: 2px solid white;
+  border-radius: 50%;
+  font-size: 0.7rem;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+/* ═══════════════════════════════════════
+   SEARCH PAGE
+═══════════════════════════════════════ */
+.search-input-wrap {
+  position: relative;
+  margin-bottom: 20px;
+}
+.search-input {
+  width: 100%;
+  padding: 13px 16px 13px 44px;
+  border: 2px solid var(--border);
+  border-radius: 30px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--text);
+  background: white;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.search-input:focus { border-color: var(--primary); }
+.search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-light);
+  pointer-events: none;
+}
+
+/* ═══════════════════════════════════════
+   PROFILE PAGE
+═══════════════════════════════════════ */
+.profile-header {
+  background: white;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 24px 20px;
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+  text-align: center;
+  position: relative;
+}
+.profile-big-avatar {
+  width: 90px; height: 90px;
+  border-radius: 50%;
+  background: var(--surface2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2rem; font-weight: 700; color: var(--primary);
+  margin: 0 auto 14px;
+  overflow: hidden;
+  border: 4px solid var(--border);
+  cursor: pointer;
+  position: relative;
+}
+.profile-big-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.profile-big-avatar .avatar-overlay {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.3);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.2s;
+  border-radius: 50%;
+  color: white; font-size: 0.75rem; font-weight: 700;
+}
+.profile-big-avatar:hover .avatar-overlay { opacity: 1; }
+
+.profile-nick { font-size: 1.3rem; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+.profile-id { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px; }
+.profile-bio { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 14px; }
+
+.profile-stats {
+  display: flex;
+  gap: 0;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+.profile-stat {
+  flex: 1;
+  text-align: center;
+  cursor: pointer;
+  padding: 8px 4px;
+  border-radius: var(--radius-sm);
+  transition: background 0.2s;
+}
+.profile-stat:hover { background: var(--surface2); }
+.profile-stat-num { font-size: 1.1rem; font-weight: 900; color: var(--primary); }
+.profile-stat-label { font-size: 0.7rem; color: var(--text-muted); font-weight: 500; }
+
+.visitor-badge {
+  font-size: 0.75rem;
+  color: var(--text-light);
+  margin-bottom: 10px;
+}
+
+.btn-follow {
+  padding: 9px 28px;
+  border-radius: 20px;
+  border: 2px solid var(--primary);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--primary);
+  color: white;
+}
+.btn-follow.following {
+  background: transparent;
+  color: var(--primary);
+}
+.btn-follow:hover { opacity: 0.85; }
+
+.btn-edit {
+  padding: 9px 20px;
+  border-radius: 20px;
+  border: 2px solid var(--border);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-muted);
+  transition: all 0.2s;
+}
+.btn-edit:hover { border-color: var(--primary); color: var(--primary); }
+
+.btn-admin {
+  padding: 9px 20px;
+  border-radius: 20px;
+  border: 2px solid #6c63ff;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: transparent;
+  color: #6c63ff;
+  transition: all 0.2s;
+}
+.btn-admin:hover { background: #6c63ff; color: white; }
+
+.btn-suspend {
+  padding: 9px 20px;
+  border-radius: 20px;
+  border: 2px solid var(--danger);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: transparent;
+  color: var(--danger);
+  transition: all 0.2s;
+}
+.btn-suspend:hover { background: var(--danger); color: white; }
+
+.btn-row {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ── EDIT FORM ── */
+.edit-form { margin-top: 16px; }
+.edit-form .form-group { margin-bottom: 12px; }
+.edit-form .form-label { text-transform: none; letter-spacing: 0; font-size: 0.85rem; }
+
+/* ═══════════════════════════════════════
+   NOTIFICATIONS
+═══════════════════════════════════════ */
+.notif-item {
+  background: white;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  padding: 13px 16px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.88rem;
+  animation: fadeUp 0.2s ease;
+}
+.notif-item.unread { border-left: 3px solid var(--primary); background: var(--primary-ultra-light); }
+.notif-icon { color: var(--primary); flex-shrink: 0; margin-top: 1px; }
+.notif-text { flex: 1; color: var(--text); }
+.notif-time { font-size: 0.72rem; color: var(--text-light); flex-shrink: 0; }
+
+/* ═══════════════════════════════════════
+   MODAL
+═══════════════════════════════════════ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(4px);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal-box {
+  background: white;
+  border-radius: var(--radius);
+  padding: 28px 24px;
+  width: 100%;
+  max-width: 380px;
+  max-height: 80vh;
+  overflow-y: auto;
+  transform: scale(0.92);
+  transition: transform 0.25s;
+  position: relative;
+}
+.modal-overlay.open .modal-box { transform: scale(1); }
+.modal-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 18px;
+  color: var(--text);
+}
+.modal-close {
+  position: absolute;
+  top: 16px; right: 16px;
+  background: var(--surface2);
+  border: none;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-muted);
+}
+.modal-close:hover { background: var(--border); }
+
+.modal-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 8px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border);
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text);
+  transition: all 0.2s;
+  text-align: left;
+}
+.modal-btn:hover { border-color: var(--primary); color: var(--primary); background: var(--surface2); }
+.modal-btn.danger { border-color: #ffcdd2; color: var(--danger); }
+.modal-btn.danger:hover { background: #fff0f0; }
+
+/* ── IMAGE LIGHTBOX ── */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.9);
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  display: none;
+}
+.lightbox.open { display: flex; }
+.lightbox img { max-width: 95vw; max-height: 92vh; object-fit: contain; border-radius: 8px; }
+
+/* ═══════════════════════════════════════
+   ADMIN
+═══════════════════════════════════════ */
+.admin-section {
+  background: white;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 20px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow);
+}
+.admin-section h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.user-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.85rem;
+}
+.user-row:last-child { border-bottom: none; }
+.user-row-info { flex: 1; }
+.user-row-id { font-weight: 700; color: var(--text); }
+.user-row-detail { color: var(--text-muted); font-size: 0.78rem; }
+.badge-admin { background: #6c63ff; color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 6px; font-weight: 700; }
+.badge-sub-admin { background: var(--primary); color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 6px; font-weight: 700; }
+.badge-suspended { background: var(--danger); color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 6px; font-weight: 700; }
+
+/* ═══════════════════════════════════════
+   SUSPEND NOTICE
+═══════════════════════════════════════ */
+.suspend-banner {
+  background: #fff0f0;
+  border: 1.5px solid #ffcdd2;
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  color: var(--danger);
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* ═══════════════════════════════════════
+   EMPTY STATE
+═══════════════════════════════════════ */
+.empty-state {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--text-muted);
+}
+.empty-state svg { color: var(--primary-light); margin-bottom: 12px; opacity: 0.5; }
+.empty-state h3 { font-size: 1rem; margin-bottom: 6px; color: var(--text); }
+.empty-state p { font-size: 0.85rem; }
+
+/* UTILS */
+.divider { height: 1px; background: var(--border); margin: 16px 0; }
+.section-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 12px;
+  margin-top: 8px;
+}
+
+/* DROPDOWN MENU */
+.dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  min-width: 150px;
+  z-index: 300;
+  overflow: hidden;
+  display: none;
+}
+.dropdown-menu.open { display: block; }
+.dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 11px 16px;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 0.88rem;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+.dropdown-item:hover { background: var(--surface2); }
+.dropdown-item.danger { color: var(--danger); }
+.dropdown-item.danger:hover { background: #fff0f0; }
+
+.tag-following {
+  font-size: 0.65rem;
+  background: var(--primary-ultra-light);
+  color: var(--primary);
+  padding: 1px 6px;
+  border-radius: 6px;
+  font-weight: 700;
+  margin-left: 4px;
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ AUTH SCREEN ═══════════════════ -->
+<div id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <img class="logo-img" id="auth-logo-img" src="" alt="logo">
+      <span class="logo-text" id="auth-logo-text">Blossom</span>
+      <div class="logo-sub">SNS</div>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="showAuthTab('login')">로그인</button>
+      <button class="auth-tab" onclick="showAuthTab('signup')">회원가입</button>
+    </div>
+    <div id="auth-error" class="error-msg"></div>
+
+    <!-- LOGIN -->
+    <div id="login-form">
+      <div class="form-group">
+        <label class="form-label">아이디</label>
+        <input class="form-input" id="login-id" type="text" placeholder="아이디를 입력하세요" autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label class="form-label">비밀번호</label>
+        <input class="form-input" id="login-pw" type="password" placeholder="비밀번호를 입력하세요" autocomplete="current-password">
+      </div>
+      <button class="btn-primary" onclick="doLogin()">로그인</button>
+    </div>
+
+    <!-- SIGNUP -->
+    <div id="signup-form" style="display:none">
+      <div class="form-group">
+        <label class="form-label">아이디</label>
+        <input class="form-input" id="su-id" type="text" placeholder="사용할 아이디">
+      </div>
+      <div class="form-group">
+        <label class="form-label">비밀번호</label>
+        <input class="form-input" id="su-pw" type="password" placeholder="비밀번호">
+      </div>
+      <div class="form-group">
+        <label class="form-label">비밀번호 재확인</label>
+        <input class="form-input" id="su-pw2" type="password" placeholder="비밀번호 확인">
+      </div>
+      <div class="form-group">
+        <label class="form-label">닉네임</label>
+        <input class="form-input" id="su-nick" type="text" placeholder="사용할 닉네임">
+      </div>
+      <button class="btn-primary" onclick="doSignup()">가입하기</button>
+    </div>
+  </div>
 </div>
+
+<!-- ═══════════════════ APP SCREEN ═══════════════════ -->
+<div id="app-screen">
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="top-bar-logo" id="top-logo">
+      <img id="top-logo-img" src="" style="height:36px;display:none;" alt="">
+      <span id="top-logo-text">Blossom</span>
+    </div>
+    <div class="top-bar-title" id="top-bar-title"></div>
+    <div style="width:60px;text-align:right;">
+      <button onclick="doLogout()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.8rem;font-family:inherit;padding:4px 8px;border-radius:8px;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='none'">로그아웃</button>
+    </div>
+  </div>
+
+  <!-- PAGES -->
+  <div class="main-content">
+
+    <!-- HOME -->
+    <div class="page active" id="page-home">
+      <div class="stories-section" id="stories-bar"></div>
+      <div class="section-label">추천 게시물</div>
+      <div id="feed-container"></div>
+    </div>
+
+    <!-- SEARCH -->
+    <div class="page" id="page-search">
+      <div class="section-label">검색</div>
+      <div class="search-input-wrap">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input class="search-input" id="search-q" type="text" placeholder="게시물, 아이디, 닉네임 검색..." oninput="doSearch()">
+      </div>
+      <div id="search-results"></div>
+    </div>
+
+    <!-- UPLOAD -->
+    <div class="page" id="page-upload">
+      <div class="upload-card">
+        <h2>새 게시물</h2>
+        <div class="form-group">
+          <label class="form-label">내용 <span style="font-weight:400;color:var(--text-light)">(최대 150자)</span></label>
+          <textarea class="upload-textarea" id="upload-text" placeholder="지금 무슨 생각을 하고 있나요?" oninput="updateCharCount(this)"></textarea>
+          <div class="char-count" id="char-count">0 / 150</div>
+        </div>
+        <div class="img-upload-area" id="img-upload-area">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+          <p>사진 추가 (최대 2장)</p>
+          <input type="file" id="upload-imgs" accept="image/*" multiple onchange="handleImgUpload(this)">
+        </div>
+        <div class="preview-imgs" id="preview-imgs"></div>
+        <div id="upload-error" class="error-msg" style="margin-top:10px;"></div>
+        <button class="btn-primary" onclick="doUpload()">게시하기</button>
+      </div>
+    </div>
+
+    <!-- NOTIFICATIONS -->
+    <div class="page" id="page-notif">
+      <div class="section-label">알림</div>
+      <div id="notif-list"></div>
+    </div>
+
+    <!-- PROFILE (own) -->
+    <div class="page" id="page-profile">
+      <div id="profile-view"></div>
+    </div>
+
+    <!-- OTHER PROFILE -->
+    <div class="page" id="page-other-profile">
+      <div id="other-profile-view"></div>
+    </div>
+
+    <!-- ADMIN -->
+    <div class="page" id="page-admin">
+      <div class="section-label">관리자 설정</div>
+      <div id="admin-view"></div>
+    </div>
+
+  </div><!-- end main-content -->
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" id="nav-home" onclick="switchPage('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>홈</span>
+    </button>
+    <button class="nav-btn" id="nav-search" onclick="switchPage('search')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <span>검색</span>
+    </button>
+    <button class="nav-btn" id="nav-upload" onclick="switchPage('upload')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      <span>업로드</span>
+    </button>
+    <button class="nav-btn" id="nav-notif" onclick="switchPage('notif')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span>알림</span>
+      <span class="nav-badge" id="notif-badge" style="display:none"></span>
+    </button>
+    <button class="nav-btn" id="nav-profile" onclick="switchPage('profile')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span>프로필</span>
+    </button>
+  </nav>
+
+</div><!-- end app-screen -->
+
+<!-- ═══════════════════ MODALS ═══════════════════ -->
+
+<!-- FOLLOW LIST MODAL -->
+<div class="modal-overlay" id="modal-follow-list">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('modal-follow-list')">✕</button>
+    <div class="modal-title" id="follow-list-title">목록</div>
+    <div id="follow-list-content"></div>
+  </div>
+</div>
+
+<!-- EDIT COMMENT MODAL -->
+<div class="modal-overlay" id="modal-edit-comment">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('modal-edit-comment')">✕</button>
+    <div class="modal-title">댓글 수정</div>
+    <textarea class="upload-textarea" id="edit-comment-text" style="height:80px;"></textarea>
+    <button class="btn-primary" style="margin-top:10px;" onclick="saveEditComment()">저장</button>
+  </div>
+</div>
+
+<!-- EDIT POST MODAL -->
+<div class="modal-overlay" id="modal-edit-post">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('modal-edit-post')">✕</button>
+    <div class="modal-title">게시물 수정</div>
+    <textarea class="upload-textarea" id="edit-post-text" oninput="updateCharCount(this, 'edit-post-char')"></textarea>
+    <div class="char-count" id="edit-post-char">0 / 150</div>
+    <button class="btn-primary" style="margin-top:10px;" onclick="saveEditPost()">저장</button>
+  </div>
+</div>
+
+<!-- SUSPEND MODAL -->
+<div class="modal-overlay" id="modal-suspend">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('modal-suspend')">✕</button>
+    <div class="modal-title" id="suspend-modal-title">정지 설정</div>
+    <button class="modal-btn" onclick="doSuspend(1)">1일 정지</button>
+    <button class="modal-btn" onclick="doSuspend(3)">3일 정지</button>
+    <button class="modal-btn" onclick="doSuspend(7)">7일 정지</button>
+    <button class="modal-btn" onclick="doSuspend(30)">30일 정지</button>
+    <button class="modal-btn danger" onclick="doSuspend(-1)">영구 정지</button>
+  </div>
+</div>
+
+<!-- GENERIC CONFIRM MODAL -->
+<div class="modal-overlay" id="modal-confirm">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('modal-confirm')">✕</button>
+    <div class="modal-title" id="confirm-title">확인</div>
+    <p id="confirm-msg" style="color:var(--text-muted);font-size:0.9rem;margin-bottom:18px;"></p>
+    <button class="btn-primary" id="confirm-ok">확인</button>
+  </div>
+</div>
+
+<!-- IMAGE LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <img id="lightbox-img" src="" alt="">
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  DATA LAYER
+// ═══════════════════════════════════════════════════════
+function loadData(key, def) {
+  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; }
+  catch(e) { return def; }
+}
+function saveData(key, val) {
+  try { localStorage.setItem(key, JSON.stringify(val)); } catch(e){}
+}
+
+function initDB() {
+  let users = loadData('sns_users', null);
+  if (!users) {
+    users = {
+      'admin': {
+        id: 'admin', pw: 'admin', nick: '관리자', bio: 'Blossom 운영팀',
+        avatar: '', role: 'admin', followers: [], following: [],
+        suspended: null, visitors: 0
+      }
+    };
+    saveData('sns_users', users);
+  }
+  if (!loadData('sns_posts', null)) saveData('sns_posts', []);
+  if (!loadData('sns_notifs', null)) saveData('sns_notifs', {});
+}
+
+function getUsers() { return loadData('sns_users', {}); }
+function getPosts() { return loadData('sns_posts', []); }
+function getUser(id) { return getUsers()[id] || null; }
+function getNotifs(uid) { return loadData('sns_notifs', {})[uid] || []; }
+
+function saveUser(user) {
+  const users = getUsers();
+  users[user.id] = user;
+  saveData('sns_users', users);
+}
+function savePosts(posts) { saveData('sns_posts', posts); }
+function addNotif(uid, msg) {
+  const all = loadData('sns_notifs', {});
+  if (!all[uid]) all[uid] = [];
+  all[uid].unshift({ msg, time: Date.now(), read: false });
+  saveData('sns_notifs', all);
+}
+function markNotifsRead(uid) {
+  const all = loadData('sns_notifs', {});
+  if (all[uid]) all[uid].forEach(n => n.read = true);
+  saveData('sns_notifs', all);
+}
+
+// ─── SESSION ───
+let currentUser = null;
+
+function isSuspended(user) {
+  if (!user || !user.suspended) return false;
+  if (user.suspended === -1) return true;
+  return Date.now() < user.suspended;
+}
+
+// ═══════════════════════════════════════════════════════
+//  AUTH
+// ═══════════════════════════════════════════════════════
+function showAuthTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach((t,i) => {
+    t.classList.toggle('active', (i===0 && tab==='login') || (i===1 && tab==='signup'));
+  });
+  document.getElementById('login-form').style.display = tab==='login' ? '' : 'none';
+  document.getElementById('signup-form').style.display = tab==='signup' ? '' : 'none';
+  document.getElementById('auth-error').classList.remove('show');
+}
+
+function showAuthError(msg) {
+  const el = document.getElementById('auth-error');
+  el.textContent = msg;
+  el.classList.add('show');
+}
+
+function doLogin() {
+  const id = document.getElementById('login-id').value.trim();
+  const pw = document.getElementById('login-pw').value;
+  const user = getUser(id);
+  if (!user) return showAuthError('존재하지 않는 아이디입니다.');
+  if (user.pw !== pw) return showAuthError('비밀번호가 틀렸습니다.');
+  currentUser = user;
+  enterApp();
+}
+
+function doSignup() {
+  const id = document.getElementById('su-id').value.trim();
+  const pw = document.getElementById('su-pw').value;
+  const pw2 = document.getElementById('su-pw2').value;
+  const nick = document.getElementById('su-nick').value.trim();
+  if (!id || !pw || !nick) return showAuthError('모든 항목을 입력해주세요.');
+  if (pw !== pw2) return showAuthError('비밀번호가 일치하지 않습니다.');
+  if (getUser(id)) return showAuthError('이미 사용 중인 아이디입니다.');
+  const newUser = {
+    id, pw, nick, bio: '', avatar: '', role: 'user',
+    followers: [], following: [], suspended: null, visitors: 0
+  };
+  saveUser(newUser);
+  currentUser = newUser;
+  enterApp();
+}
+
+function doLogout() {
+  currentUser = null;
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('app-screen').classList.remove('active');
+  document.getElementById('login-id').value = '';
+  document.getElementById('login-pw').value = '';
+}
+
+function enterApp() {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app-screen').classList.add('active');
+  switchPage('home');
+  updateNotifBadge();
+}
+
+// ═══════════════════════════════════════════════════════
+//  PAGE NAVIGATION
+// ═══════════════════════════════════════════════════════
+let currentPage = 'home';
+
+function switchPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  const navMap = { home:'nav-home', search:'nav-search', upload:'nav-upload', notif:'nav-notif', profile:'nav-profile' };
+  if (navMap[page]) document.getElementById(navMap[page]).classList.add('active');
+  const titleMap = { home:'', search:'검색', upload:'새 게시물', notif:'알림', profile:'프로필', 'other-profile':'프로필', admin:'관리자 설정' };
+  document.getElementById('top-bar-title').textContent = titleMap[page] || '';
+  const logoEl = document.getElementById('top-logo');
+  logoEl.style.display = (page === 'home') ? '' : 'none';
+  currentPage = page;
+
+  if (page === 'home') renderHome();
+  if (page === 'profile') renderMyProfile();
+  if (page === 'notif') { renderNotifs(); markNotifsRead(currentUser.id); updateNotifBadge(); }
+  if (page === 'upload') resetUpload();
+  if (page === 'search') { document.getElementById('search-q').value=''; renderSearchResults(''); }
+}
+
+// ═══════════════════════════════════════════════════════
+//  HOME / FEED
+// ═══════════════════════════════════════════════════════
+function renderHome() {
+  // Stories
+  const bar = document.getElementById('stories-bar');
+  const following = currentUser.following || [];
+  if (following.length === 0) {
+    bar.innerHTML = '<div style="color:var(--text-light);font-size:0.82rem;padding:8px 4px;">팔로우한 사람이 없습니다</div>';
+  } else {
+    bar.innerHTML = following.map(uid => {
+      const u = getUser(uid);
+      if (!u) return '';
+      return `<div class="story-item" onclick="viewProfile('${uid}')">
+        <div class="story-ring"><div class="story-avatar">${avatarEl(u,'52px')}</div></div>
+        <span class="story-name">${escHtml(u.nick)}</span>
+      </div>`;
+    }).join('');
+  }
+
+  // Feed
+  const container = document.getElementById('feed-container');
+  const posts = getPosts().filter(p => !p.hidden);
+  // Sort: following first, then by date
+  const sorted = [...posts].sort((a,b) => {
+    const aFollow = following.includes(a.authorId) ? 1 : 0;
+    const bFollow = following.includes(b.authorId) ? 1 : 0;
+    if (bFollow !== aFollow) return bFollow - aFollow;
+    return b.time - a.time;
+  });
+  if (sorted.length === 0) {
+    container.innerHTML = emptyState('게시물이 없습니다','첫 게시물을 작성해보세요!');
+    return;
+  }
+  container.innerHTML = sorted.map(p => renderPost(p)).join('');
+}
+
+function renderPost(post) {
+  const author = getUser(post.authorId) || { nick: '알 수 없음', avatar: '', id: '?' };
+  const isOwn = currentUser.id === post.authorId;
+  const isAdmin = currentUser.role === 'admin' || currentUser.role === 'sub-admin';
+  const liked = (post.likes || []).includes(currentUser.id);
+  const disliked = (post.dislikes || []).includes(currentUser.id);
+  const retweeted = (post.retweets || []).includes(currentUser.id);
+
+  let bodyHtml = '';
+  if (post.adminDeleted) {
+    bodyHtml = `<p class="post-text post-deleted">⚠️ 부적절한 게시물이 삭제되었습니다</p>`;
+  } else if (post.deleted) {
+    bodyHtml = `<p class="post-text" style="color:var(--text-light);font-style:italic;">삭제된 게시물입니다</p>`;
+  } else {
+    bodyHtml = `<p class="post-text">${escHtml(post.text || '')}</p>`;
+  }
+
+  const imgsHtml = (!post.deleted && !post.adminDeleted && post.images && post.images.length > 0)
+    ? `<div class="post-images ${post.images.length===1?'one':'two'}">
+        ${post.images.map(img=>`<img src="${img}" onclick="openLightbox('${img}')" alt="">`).join('')}
+       </div>`
+    : '';
+
+  const moreMenu = `<div style="position:relative">
+    <button class="post-more-btn" onclick="togglePostMenu('${post.id}')">•••</button>
+    <div class="dropdown-menu" id="pmenu-${post.id}">
+      ${isOwn && !post.adminDeleted ? `<button class="dropdown-item" onclick="openEditPost('${post.id}')">수정</button>` : ''}
+      ${isOwn ? `<button class="dropdown-item danger" onclick="deletePost('${post.id}', false)">삭제</button>` : ''}
+      ${(isAdmin && !isOwn) ? `<button class="dropdown-item danger" onclick="deletePost('${post.id}', true)">관리자 삭제</button>` : ''}
+    </div>
+  </div>`;
+
+  const canAct = !isOwn && !isSuspended(currentUser);
+  const actDisabled = isOwn || isSuspended(currentUser);
+
+  const commentsHtml = renderComments(post);
+
+  return `<div class="post-card" id="post-${post.id}">
+    <div class="post-header">
+      <div class="post-avatar" onclick="viewProfile('${author.id}')">${avatarEl(author,'40px')}</div>
+      <div class="post-meta">
+        <div class="post-nick" onclick="viewProfile('${author.id}')">${escHtml(author.nick)}${(currentUser.following||[]).includes(author.id)?'<span class="tag-following">팔로우</span>':''}</div>
+        <div class="post-date">${formatDate(post.time)}</div>
+      </div>
+      ${(isOwn || isAdmin) ? moreMenu : ''}
+    </div>
+    <div class="post-body">${bodyHtml}</div>
+    ${imgsHtml}
+    <div class="post-actions">
+      <button class="action-btn" onclick="toggleComment('${post.id}')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        ${(post.comments||[]).length}
+      </button>
+      <button class="action-btn ${retweeted?'retweeted':''}" onclick="${actDisabled?'':'doRetweet(\''+post.id+'\')'}" ${actDisabled?'disabled style="opacity:0.4"':''}>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+        ${(post.retweets||[]).length}
+      </button>
+      <button class="action-btn ${liked?'liked':''}" onclick="${actDisabled?'':'doLike(\''+post.id+'\')'}" ${actDisabled?'disabled style="opacity:0.4"':''}>
+        <svg viewBox="0 0 24 24" fill="${liked?'var(--primary)':'none'}" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        ${(post.likes||[]).length}
+      </button>
+      <button class="action-btn ${disliked?'disliked':''}" onclick="${actDisabled?'':'doDislike(\''+post.id+'\')'}" ${actDisabled?'disabled style="opacity:0.4"':''}>
+        <svg viewBox="0 0 24 24" fill="${disliked?'#6666cc':'none'}" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/><path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>
+        ${(post.dislikes||[]).length}
+      </button>
+    </div>
+    <div class="comments-section" id="cmts-${post.id}" style="display:none">
+      ${!isSuspended(currentUser) ? `<div class="comment-input-row">
+        <input class="comment-input" id="ci-${post.id}" placeholder="댓글 입력..." onkeydown="if(event.key==='Enter')submitComment('${post.id}')">
+        <button class="comment-submit" onclick="submitComment('${post.id}')">작성</button>
+      </div>` : '<div style="color:var(--text-light);font-size:0.82rem;margin-bottom:8px;">정지된 계정은 댓글을 작성할 수 없습니다.</div>'}
+      <div id="clist-${post.id}">${commentsHtml}</div>
+    </div>
+  </div>`;
+}
+
+function renderComments(post) {
+  if (!post.comments || post.comments.length === 0) return '';
+  return post.comments.map(c => renderComment(c, post.id)).join('');
+}
+
+function renderComment(c, postId) {
+  const author = getUser(c.authorId) || { nick: '알 수 없음', avatar: '', id: '?' };
+  const isOwn = currentUser.id === c.authorId;
+  const liked = (c.likes||[]).includes(currentUser.id);
+  const disliked = (c.dislikes||[]).includes(currentUser.id);
+  const retweeted = (c.retweets||[]).includes(currentUser.id);
+  const actDisabled = isSuspended(currentUser);
+  return `<div class="comment-item" id="cm-${c.id}">
+    <div class="comment-header">
+      <div class="comment-avatar" onclick="viewProfile('${author.id}')">${avatarEl(author,'28px')}</div>
+      <span class="comment-nick" onclick="viewProfile('${author.id}')">${escHtml(author.nick)}</span>
+      <span class="comment-date">${formatDate(c.time)}</span>
+    </div>
+    <div class="comment-text" id="ctxt-${c.id}">${escHtml(c.text)}</div>
+    <div class="comment-actions">
+      <button class="comment-action-btn ${liked?'liked':''}" onclick="${actDisabled?'':'likeComment(\''+postId+'\',\''+c.id+'\')'}" ${actDisabled?'disabled':''}>
+        <svg viewBox="0 0 24 24" fill="${liked?'var(--primary)':'none'}" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        ${(c.likes||[]).length}
+      </button>
+      <button class="comment-action-btn ${disliked?'disliked':''}" onclick="${actDisabled?'':'dislikeComment(\''+postId+'\',\''+c.id+'\')'}" ${actDisabled?'disabled':''}>
+        <svg viewBox="0 0 24 24" fill="${disliked?'#6666cc':'none'}" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/><path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>
+        ${(c.dislikes||[]).length}
+      </button>
+      <button class="comment-action-btn ${retweeted?'retweeted':''}" onclick="${actDisabled?'':'retweetComment(\''+postId+'\',\''+c.id+'\')'}" ${actDisabled?'disabled':''} style="${retweeted?'color:var(--success)':''}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+        ${(c.retweets||[]).length}
+      </button>
+      ${isOwn ? `<button class="comment-action-btn" onclick="openEditComment('${postId}','${c.id}')">수정</button>` : ''}
+      ${isOwn ? `<button class="comment-action-btn" style="color:var(--danger)" onclick="deleteComment('${postId}','${c.id}')">삭제</button>` : ''}
+    </div>
+  </div>`;
+}
+
+function toggleComment(postId) {
+  const el = document.getElementById('cmts-'+postId);
+  el.style.display = el.style.display === 'none' ? '' : 'none';
+}
+
+// ── POST ACTIONS ──
+function doLike(postId) {
+  const posts = getPosts();
+  const p = posts.find(p=>p.id===postId); if(!p) return;
+  p.likes = p.likes || [];
+  p.dislikes = p.dislikes || [];
+  if (p.likes.includes(currentUser.id)) {
+    p.likes = p.likes.filter(u=>u!==currentUser.id);
+  } else {
+    p.likes.push(currentUser.id);
+    p.dislikes = p.dislikes.filter(u=>u!==currentUser.id);
+    if (p.authorId !== currentUser.id) addNotif(p.authorId, `${currentUser.nick}님이 게시물을 좋아합니다.`);
+  }
+  savePosts(posts); refreshFeed();
+}
+
+function doDislike(postId) {
+  const posts = getPosts();
+  const p = posts.find(p=>p.id===postId); if(!p) return;
+  p.dislikes = p.dislikes || [];
+  p.likes = p.likes || [];
+  if (p.dislikes.includes(currentUser.id)) {
+    p.dislikes = p.dislikes.filter(u=>u!==currentUser.id);
+  } else {
+    p.dislikes.push(currentUser.id);
+    p.likes = p.likes.filter(u=>u!==currentUser.id);
+  }
+  savePosts(posts); refreshFeed();
+}
+
+function doRetweet(postId) {
+  const posts = getPosts();
+  const p = posts.find(p=>p.id===postId); if(!p) return;
+  p.retweets = p.retweets || [];
+  if (p.retweets.includes(currentUser.id)) {
+    p.retweets = p.retweets.filter(u=>u!==currentUser.id);
+  } else {
+    p.retweets.push(currentUser.id);
+    if (p.authorId !== currentUser.id) addNotif(p.authorId, `${currentUser.nick}님이 게시물을 리트윗했습니다.`);
+  }
+  savePosts(posts); refreshFeed();
+}
+
+function deletePost(postId, isAdmin) {
+  const posts = getPosts();
+  const p = posts.find(p=>p.id===postId); if(!p) return;
+  if (isAdmin) {
+    p.adminDeleted = true;
+    p.images = [];
+    addNotif(p.authorId, '관리자에 의해 게시물이 삭제되었습니다.');
+  } else {
+    if (p.adminDeleted) {
+      p.adminDeleted = false;
+      p.deleted = true;
+    } else {
+      p.deleted = true;
+      p.text = '';
+      p.images = [];
+    }
+  }
+  savePosts(posts); closeAllDropdowns(); refreshFeed();
+}
+
+function togglePostMenu(postId) {
+  const menu = document.getElementById('pmenu-'+postId);
+  const isOpen = menu.classList.contains('open');
+  closeAllDropdowns();
+  if (!isOpen) menu.classList.add('open');
+}
+function closeAllDropdowns() {
+  document.querySelectorAll('.dropdown-menu').forEach(m=>m.classList.remove('open'));
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('.post-more-btn') && !e.target.closest('.dropdown-menu')) closeAllDropdowns();
+});
+
+// ── EDIT POST ──
+let editPostId = null;
+function openEditPost(postId) {
+  closeAllDropdowns();
+  const posts = getPosts();
+  const p = posts.find(p=>p.id===postId); if(!p) return;
+  editPostId = postId;
+  const ta = document.getElementById('edit-post-text');
+  ta.value = p.text || '';
+  document.getElementById('edit-post-char').textContent = `${ta.value.length} / 150`;
+  openModal('modal-edit-post');
+}
+function saveEditPost() {
+  const text = document.getElementById('edit-post-text').value;
+  if (text.length > 150) return;
+  const posts = getPosts();
+  const p = posts.find(p=>p.id===editPostId); if(!p) return;
+  p.text = text;
+  p.edited = true;
+  savePosts(posts);
+  closeModal('modal-edit-post');
+  refreshFeed();
+}
+
+// ── COMMENTS ──
+function submitComment(postId) {
+  if (isSuspended(currentUser)) return;
+  const inp = document.getElementById('ci-'+postId);
+  const text = inp.value.trim();
+  if (!text) return;
+  const posts = getPosts();
+  const p = posts.find(p=>p.id===postId); if(!p) return;
+  p.comments = p.comments || [];
+  const c = { id: uid(), authorId: currentUser.id, text, time: Date.now(), likes:[], dislikes:[], retweets:[] };
+  p.comments.push(c);
+  savePosts(posts);
+  inp.value = '';
+  if (p.authorId !== currentUser.id) addNotif(p.authorId, `${currentUser.nick}님이 댓글을 남겼습니다.`);
+  document.getElementById('clist-'+postId).innerHTML = renderComments(p);
+}
+
+function likeComment(postId, cId) {
+  const posts = getPosts();
+  const p = posts.find(p=>p.id===postId); if(!p) return;
+  const c = p.comments.find(c=>c.id===cId); if(!c) return;
+  c.likes = c.likes||[]; c.dislikes = c.dislikes||[];
+  if (c.likes.includes(currentUser.id)) c.likes = c.likes.filter(u=>u!==currentUser.id);
+  else { c.likes.push(currentUser.id); c.dislikes = c.dislikes.filter(u=>u!==currentUser.id); }
+  savePosts(posts);
+  document.getElementById('cm-'+cId).outerHTML = renderComment(c, postId);
+}
+function dislikeComment(postId, cId) {
+  const posts = getPosts();
+  const p = posts.find(p=>p.id===postId); if(!p) return;
+  const c = p.comments.find(c=>c.id===cId); if(!c) return;
+  c.dislikes = c.dislikes||[]; c.likes = c.likes||[];
+  if (c.dislikes.includes(currentUser.id)) c.dislikes = c.dislikes.filter(u=>u!==currentUser.id);
+  else { c.dislikes.push(currentUser.id); c.likes = c.likes.filter(u=>u!==currentUser.id); }
+  savePosts(posts);
+  document.getElementById('cm-'+cId).outerHTML = renderComment(c, postId);
+}
+function retweetComment(postId, cId) {
+  const posts = getPosts();
+  const p = posts.find(p=>p.id===postId); if(!p) return;
+  const c = p.comments.find(c=>c.id===cId); if(!c) return;
+  c.retweets = c.retweets||[];
+  if (c.retweets.includes(currentUser.id)) c.retweets = c.retweets.filter(u=>u!==currentUser.id);
+  else c.retweets.push(currentUser.id);
+  savePosts(posts);
+  document.getElementById('cm-'+cId).outerHTML = renderComment(c, postId);
+}
+
+let editCommentPostId=null, editCommentId=null;
+function openEditComment(postId, cId) {
+  editCommentPostId=postId; editCommentId=cId;
+  const posts = getPosts();
+  const p = posts.find(p=>p.id===postId);
+  const c = p.comments.find(c=>c.id===cId);
+  document.getElementById('edit-comment-text').value = c.text;
+  openModal('modal-edit-comment');
+}
+function saveEditComment() {
+  const text = document.getElementById('edit-comment-text').value.trim();
+  if (!text) return;
+  const posts = getPosts();
+  const p = posts.find(p=>p.id===editCommentPostId);
+  const c = p.comments.find(c=>c.id===editCommentId);
+  c.text = text; c.edited = true;
+  savePosts(posts);
+  closeModal('modal-edit-comment');
+  document.getElementById('ctxt-'+editCommentId).textContent = text;
+}
+function deleteComment(postId, cId) {
+  const posts = getPosts();
+  const p = posts.find(p=>p.id===postId);
+  p.comments = p.comments.filter(c=>c.id!==cId);
+  savePosts(posts);
+  const el = document.getElementById('cm-'+cId);
+  if (el) el.remove();
+}
+
+function refreshFeed() {
+  if (currentPage === 'home') renderHome();
+  else if (currentPage === 'other-profile') renderOtherProfile(viewingUid);
+  else if (currentPage === 'profile') renderMyProfile();
+}
+
+// ═══════════════════════════════════════════════════════
+//  UPLOAD
+// ═══════════════════════════════════════════════════════
+let uploadImgData = [];
+
+function resetUpload() {
+  document.getElementById('upload-text').value = '';
+  document.getElementById('char-count').textContent = '0 / 150';
+  document.getElementById('char-count').className = 'char-count';
+  document.getElementById('preview-imgs').innerHTML = '';
+  document.getElementById('upload-imgs').value = '';
+  document.getElementById('upload-error').classList.remove('show');
+  uploadImgData = [];
+}
+
+function updateCharCount(ta, countId='char-count') {
+  const len = ta.value.length;
+  const el = document.getElementById(countId);
+  el.textContent = `${len} / 150`;
+  el.className = 'char-count' + (len>140?' near':'') + (len>150?' over':'');
+}
+
+function handleImgUpload(inp) {
+  const files = Array.from(inp.files);
+  const total = uploadImgData.length + files.length;
+  if (total > 2) {
+    alert('사진은 최대 2장까지 업로드 가능합니다.'); inp.value=''; return;
+  }
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      uploadImgData.push(e.target.result);
+      renderPreviews();
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function renderPreviews() {
+  document.getElementById('preview-imgs').innerHTML = uploadImgData.map((d,i) =>
+    `<div class="preview-img-wrap">
+       <img src="${d}" alt="">
+       <span class="preview-remove" onclick="removePreview(${i})">✕</span>
+     </div>`
+  ).join('');
+}
+
+function removePreview(idx) {
+  uploadImgData.splice(idx, 1);
+  renderPreviews();
+}
+
+function doUpload() {
+  if (isSuspended(currentUser)) {
+    const err = document.getElementById('upload-error');
+    err.textContent = '정지된 계정은 게시물을 작성할 수 없습니다.';
+    err.classList.add('show'); return;
+  }
+  const text = document.getElementById('upload-text').value.trim();
+  if (!text && uploadImgData.length === 0) {
+    const err = document.getElementById('upload-error');
+    err.textContent = '글이나 사진을 입력해주세요.';
+    err.classList.add('show'); return;
+  }
+  if (text.length > 150) {
+    const err = document.getElementById('upload-error');
+    err.textContent = '글은 150자를 초과할 수 없습니다.';
+    err.classList.add('show'); return;
+  }
+  const posts = getPosts();
+  const post = {
+    id: uid(), authorId: currentUser.id, text, images: [...uploadImgData],
+    time: Date.now(), likes:[], dislikes:[], retweets:[], comments:[]
+  };
+  posts.unshift(post);
+  savePosts(posts);
+  resetUpload();
+  switchPage('home');
+}
+
+// ═══════════════════════════════════════════════════════
+//  SEARCH
+// ═══════════════════════════════════════════════════════
+function doSearch() {
+  const q = document.getElementById('search-q').value.trim();
+  renderSearchResults(q);
+}
+
+function renderSearchResults(q) {
+  const container = document.getElementById('search-results');
+  if (!q) { container.innerHTML = '<div class="empty-state"><p>검색어를 입력하세요</p></div>'; return; }
+  const ql = q.toLowerCase();
+
+  // Users
+  const users = Object.values(getUsers()).filter(u =>
+    u.id.toLowerCase().includes(ql) || u.nick.toLowerCase().includes(ql)
+  );
+
+  // Posts
+  const posts = getPosts().filter(p =>
+    !p.deleted && !p.adminDeleted && (p.text||'').toLowerCase().includes(ql)
+  );
+
+  let html = '';
+  if (users.length > 0) {
+    html += '<div class="section-label">사용자</div>';
+    html += users.map(u => `
+      <div class="post-card" style="cursor:pointer" onclick="viewProfile('${u.id}')">
+        <div class="post-header">
+          <div class="post-avatar">${avatarEl(u,'40px')}</div>
+          <div class="post-meta">
+            <div class="post-nick">${escHtml(u.nick)}</div>
+            <div class="post-date">@${escHtml(u.id)}</div>
+          </div>
+        </div>
+      </div>`).join('');
+  }
+  if (posts.length > 0) {
+    html += '<div class="section-label" style="margin-top:16px">게시물</div>';
+    html += posts.map(p => renderPost(p)).join('');
+  }
+  if (!html) html = emptyState('검색 결과 없음', `'${escHtml(q)}'에 해당하는 결과가 없습니다.`);
+  container.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════
+//  PROFILE (MY)
+// ═══════════════════════════════════════════════════════
+function renderMyProfile() {
+  currentUser = getUser(currentUser.id) || currentUser;
+  const container = document.getElementById('profile-view');
+  const sus = isSuspended(currentUser);
+  const susMsg = sus ? `<div class="suspend-banner">⛔ 계정이 정지 상태입니다. 게시물 열람만 가능합니다.</div>` : '';
+  const posts = getPosts().filter(p=>p.authorId===currentUser.id && !p.deleted).sort((a,b)=>b.time-a.time);
+  const isAdmin = currentUser.role==='admin' || currentUser.role==='sub-admin';
+
+  let editHtml = `
+    <div class="edit-form" id="profile-edit-form" style="display:none">
+      <div class="form-group">
+        <label class="form-label">닉네임</label>
+        <input class="form-input" id="edit-nick" value="${escHtml(currentUser.nick)}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">소개</label>
+        <input class="form-input" id="edit-bio" value="${escHtml(currentUser.bio||'')}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">아이디 변경</label>
+        <input class="form-input" id="edit-id-new" placeholder="새 아이디 (변경 시 입력)">
+      </div>
+      <div class="form-group">
+        <label class="form-label">비밀번호 변경</label>
+        <input class="form-input" id="edit-pw-new" type="password" placeholder="새 비밀번호 (변경 시 입력)">
+      </div>
+      <div class="form-group">
+        <label class="form-label">프로필 사진</label>
+        <input type="file" id="edit-avatar-file" accept="image/*" onchange="previewAvatarEdit(this)" style="font-size:0.85rem;color:var(--text-muted)">
+        <img id="edit-avatar-preview" style="width:60px;height:60px;border-radius:50%;object-fit:cover;margin-top:8px;display:none">
+      </div>
+      <div id="profile-edit-error" class="error-msg"></div>
+      <button class="btn-primary" onclick="saveProfile()" style="margin-top:4px">저장</button>
+      <button class="btn-edit" onclick="toggleEditForm()" style="margin-top:8px;display:block;width:100%;text-align:center">취소</button>
+    </div>`;
+
+  container.innerHTML = `
+    ${susMsg}
+    <div class="profile-header">
+      <div class="profile-big-avatar" onclick="if(!${sus})triggerAvatarEdit()">
+        ${avatarEl(currentUser,'90px')}
+        ${!sus?'<div class="avatar-overlay">변경</div>':''}
+      </div>
+      <input type="file" id="avatar-file-input" accept="image/*" style="display:none" onchange="handleAvatarChange(this)">
+      <div class="profile-nick">${escHtml(currentUser.nick)}</div>
+      <div class="profile-id">@${escHtml(currentUser.id)}</div>
+      <div class="profile-bio">${escHtml(currentUser.bio||'자기소개가 없습니다')}</div>
+      <div class="visitor-badge">👁️ 누적 방문자 ${currentUser.visitors||0}명</div>
+      <div class="profile-stats">
+        <div class="profile-stat" onclick="showFollowList('${currentUser.id}','following')">
+          <div class="profile-stat-num">${(currentUser.following||[]).length}</div>
+          <div class="profile-stat-label">팔로잉</div>
+        </div>
+        <div class="profile-stat" onclick="showFollowList('${currentUser.id}','followers')">
+          <div class="profile-stat-num">${(currentUser.followers||[]).length}</div>
+          <div class="profile-stat-label">팔로워</div>
+        </div>
+        <div class="profile-stat">
+          <div class="profile-stat-num">${posts.length}</div>
+          <div class="profile-stat-label">게시물</div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-edit" onclick="toggleEditForm()">프로필 수정</button>
+        ${isAdmin ? `<button class="btn-admin" onclick="switchPage('admin')">관리자 설정</button>` : ''}
+      </div>
+      ${editHtml}
+    </div>
+    <div class="section-label">내 게시물</div>
+    ${posts.map(p=>renderPost(p)).join('') || emptyState('게시물 없음','아직 게시물이 없습니다.')}`;
+}
+
+function toggleEditForm() {
+  const f = document.getElementById('profile-edit-form');
+  f.style.display = f.style.display === 'none' ? '' : 'none';
+}
+
+let newAvatarData = '';
+function triggerAvatarEdit() {
+  document.getElementById('avatar-file-input').click();
+}
+function handleAvatarChange(inp) {
+  const file = inp.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    newAvatarData = e.target.result;
+    currentUser.avatar = newAvatarData;
+    saveUser(currentUser);
+    renderMyProfile();
+  };
+  reader.readAsDataURL(file);
+}
+function previewAvatarEdit(inp) {
+  const file = inp.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    newAvatarData = e.target.result;
+    const prev = document.getElementById('edit-avatar-preview');
+    prev.src = e.target.result;
+    prev.style.display = '';
+  };
+  reader.readAsDataURL(file);
+}
+
+function saveProfile() {
+  const nick = document.getElementById('edit-nick').value.trim();
+  const bio = document.getElementById('edit-bio').value.trim();
+  const newId = document.getElementById('edit-id-new').value.trim();
+  const newPw = document.getElementById('edit-pw-new').value;
+  const errEl = document.getElementById('profile-edit-error');
+
+  if (!nick) { errEl.textContent='닉네임을 입력해주세요.'; errEl.classList.add('show'); return; }
+
+  const users = getUsers();
+  let finalId = currentUser.id;
+
+  if (newId && newId !== currentUser.id) {
+    if (users[newId]) { errEl.textContent='이미 사용 중인 아이디입니다.'; errEl.classList.add('show'); return; }
+    // Migrate: copy user to new ID, update all references
+    const oldId = currentUser.id;
+    currentUser.id = newId;
+    users[newId] = {...currentUser};
+    delete users[oldId];
+
+    // Update followers/following references
+    Object.values(users).forEach(u => {
+      u.followers = (u.followers||[]).map(f=>f===oldId?newId:f);
+      u.following = (u.following||[]).map(f=>f===oldId?newId:f);
+    });
+    // Update posts
+    const posts = getPosts().map(p => {
+      if (p.authorId===oldId) p.authorId=newId;
+      p.comments = (p.comments||[]).map(c=>{if(c.authorId===oldId)c.authorId=newId;return c;});
+      return p;
+    });
+    savePosts(posts);
+    finalId = newId;
+  }
+
+  users[finalId].nick = nick;
+  users[finalId].bio = bio;
+  if (newPw) users[finalId].pw = newPw;
+  if (newAvatarData) users[finalId].avatar = newAvatarData;
+  saveData('sns_users', users);
+  currentUser = users[finalId];
+  newAvatarData = '';
+  renderMyProfile();
+}
+
+// ═══════════════════════════════════════════════════════
+//  OTHER PROFILE
+// ═══════════════════════════════════════════════════════
+let viewingUid = null;
+let suspendingUid = null;
+
+function viewProfile(uid) {
+  if (uid === currentUser.id) { switchPage('profile'); return; }
+  viewingUid = uid;
+  // Count visitor
+  const u = getUser(uid);
+  if (u) { u.visitors = (u.visitors||0)+1; saveUser(u); }
+  switchPage('other-profile');
+  renderOtherProfile(uid);
+}
+
+function renderOtherProfile(uid) {
+  const u = getUser(uid);
+  if (!u) return;
+  const container = document.getElementById('other-profile-view');
+  const isFollowing = (currentUser.following||[]).includes(uid);
+  const isAdmin = currentUser.role==='admin';
+  const sus = isSuspended(u);
+  const susMsg = sus ? `<div class="suspend-banner">⛔ 이 계정은 현재 정지 상태입니다.</div>` : '';
+
+  const posts = getPosts().filter(p=>p.authorId===uid && !p.deleted).sort((a,b)=>b.time-a.time);
+
+  container.innerHTML = `
+    ${susMsg}
+    <div class="profile-header">
+      <div class="profile-big-avatar">${avatarEl(u,'90px')}</div>
+      <div class="profile-nick">${escHtml(u.nick)}</div>
+      <div class="profile-id">@${escHtml(u.id)}</div>
+      <div class="profile-bio">${escHtml(u.bio||'자기소개가 없습니다')}</div>
+      <div class="visitor-badge">👁️ 누적 방문자 ${u.visitors||0}명</div>
+      <div class="profile-stats">
+        <div class="profile-stat" onclick="showFollowList('${uid}','following')">
+          <div class="profile-stat-num">${(u.following||[]).length}</div>
+          <div class="profile-stat-label">팔로잉</div>
+        </div>
+        <div class="profile-stat" onclick="showFollowList('${uid}','followers')">
+          <div class="profile-stat-num">${(u.followers||[]).length}</div>
+          <div class="profile-stat-label">팔로워</div>
+        </div>
+        <div class="profile-stat">
+          <div class="profile-stat-num">${posts.length}</div>
+          <div class="profile-stat-label">게시물</div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-follow ${isFollowing?'following':''}" onclick="toggleFollow('${uid}')">
+          ${isFollowing?'팔로잉':'팔로우'}
+        </button>
+        ${isAdmin ? `<button class="btn-suspend" onclick="openSuspendModal('${uid}')">정지 설정</button>` : ''}
+      </div>
+    </div>
+    <div class="section-label">${escHtml(u.nick)}의 게시물</div>
+    ${posts.map(p=>renderPost(p)).join('') || emptyState('게시물 없음','아직 게시물이 없습니다.')}`;
+}
+
+function toggleFollow(uid) {
+  currentUser = getUser(currentUser.id) || currentUser;
+  const target = getUser(uid); if (!target) return;
+  currentUser.following = currentUser.following || [];
+  target.followers = target.followers || [];
+  const isFollowing = currentUser.following.includes(uid);
+  if (isFollowing) {
+    currentUser.following = currentUser.following.filter(u=>u!==uid);
+    target.followers = target.followers.filter(u=>u!==currentUser.id);
+  } else {
+    currentUser.following.push(uid);
+    target.followers.push(currentUser.id);
+    addNotif(uid, `${currentUser.nick}님이 팔로우했습니다.`);
+  }
+  saveUser(currentUser);
+  saveUser(target);
+  renderOtherProfile(uid);
+}
+
+// FOLLOW LIST MODAL
+function showFollowList(uid, type) {
+  const u = getUser(uid); if(!u) return;
+  const list = type==='following' ? (u.following||[]) : (u.followers||[]);
+  document.getElementById('follow-list-title').textContent = type==='following' ? '팔로잉 목록' : '팔로워 목록';
+  const users = getUsers();
+  document.getElementById('follow-list-content').innerHTML = list.length === 0
+    ? '<div style="color:var(--text-muted);text-align:center;padding:20px;">목록이 없습니다</div>'
+    : list.map(fid => {
+        const fu = users[fid];
+        if (!fu) return '';
+        return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="closeModal('modal-follow-list');viewProfile('${fid}')">
+          <div style="width:36px;height:36px;border-radius:50%;overflow:hidden;background:var(--surface2);flex-shrink:0">${avatarEl(fu,'36px')}</div>
+          <div>
+            <div style="font-weight:700;font-size:0.9rem">${escHtml(fu.nick)}</div>
+            <div style="font-size:0.78rem;color:var(--text-muted)">@${escHtml(fu.id)}</div>
+          </div>
+        </div>`;
+      }).join('');
+  openModal('modal-follow-list');
+}
+
+// SUSPEND
+function openSuspendModal(uid) {
+  suspendingUid = uid;
+  const u = getUser(uid);
+  document.getElementById('suspend-modal-title').textContent = `정지 설정: @${u.id}`;
+  openModal('modal-suspend');
+}
+function doSuspend(days) {
+  const u = getUser(suspendingUid); if(!u) return;
+  if (days === -1) {
+    u.suspended = -1;
+    addNotif(u.id, '계정이 영구 정지되었습니다.');
+  } else {
+    u.suspended = Date.now() + days*86400000;
+    addNotif(u.id, `계정이 ${days}일 정지되었습니다.`);
+  }
+  saveUser(u);
+  closeModal('modal-suspend');
+  renderOtherProfile(suspendingUid);
+}
+
+// ═══════════════════════════════════════════════════════
+//  NOTIFICATIONS
+// ═══════════════════════════════════════════════════════
+function renderNotifs() {
+  const notifs = getNotifs(currentUser.id);
+  const container = document.getElementById('notif-list');
+  if (notifs.length === 0) {
+    container.innerHTML = emptyState('알림 없음','새 알림이 없습니다.');
+    return;
+  }
+  container.innerHTML = notifs.map(n => `
+    <div class="notif-item ${n.read?'':'unread'}">
+      <div class="notif-icon">🔔</div>
+      <div class="notif-text">${escHtml(n.msg)}</div>
+      <div class="notif-time">${formatDate(n.time)}</div>
+    </div>`).join('');
+}
+
+function updateNotifBadge() {
+  const notifs = getNotifs(currentUser.id);
+  const unread = notifs.filter(n=>!n.read).length;
+  const badge = document.getElementById('notif-badge');
+  if (unread > 0) { badge.textContent = unread > 9 ? '9+' : unread; badge.style.display=''; }
+  else badge.style.display = 'none';
+}
+
+// ═══════════════════════════════════════════════════════
+//  ADMIN
+// ═══════════════════════════════════════════════════════
+function renderAdmin() {
+  const container = document.getElementById('admin-view');
+  const users = getUsers();
+  const isMain = currentUser.role === 'admin';
+  
+  let subAdminHtml = '';
+  if (isMain) {
+    const normalUsers = Object.values(users).filter(u=>u.id!=='admin' && u.role!=='admin');
+    subAdminHtml = `
+      <div class="admin-section">
+        <h3>부관리자 설정</h3>
+        ${normalUsers.map(u=>`
+          <div class="user-row">
+            <div class="user-row-info">
+              <div class="user-row-id">${escHtml(u.nick)} <span style="color:var(--text-muted)">@${escHtml(u.id)}</span>
+                ${u.role==='sub-admin'?'<span class="badge-sub-admin">부관리자</span>':''}
+              </div>
+            </div>
+            <button onclick="toggleSubAdmin('${u.id}')" style="padding:5px 12px;border-radius:8px;border:1.5px solid var(--border);background:none;cursor:pointer;font-size:0.8rem;font-family:inherit;color:var(--text-muted)">
+              ${u.role==='sub-admin'?'해제':'설정'}
+            </button>
+          </div>`).join('')}
+      </div>`;
+  }
+
+  container.innerHTML = subAdminHtml + `
+    <div class="admin-section">
+      <h3>이용자 목록</h3>
+      ${Object.values(users).map(u=>`
+        <div class="user-row">
+          <div class="user-row-info">
+            <div class="user-row-id">
+              ${escHtml(u.nick)}
+              ${u.role==='admin'?'<span class="badge-admin">관리자</span>':''}
+              ${u.role==='sub-admin'?'<span class="badge-sub-admin">부관리자</span>':''}
+              ${isSuspended(u)?'<span class="badge-suspended">정지</span>':''}
+            </div>
+            <div class="user-row-detail">
+              ID: ${escHtml(u.id)} | PW: ${escHtml(u.pw)}
+              | 팔로워: ${(u.followers||[]).length} | 팔로잉: ${(u.following||[]).length}
+            </div>
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function toggleSubAdmin(uid) {
+  const u = getUser(uid); if(!u) return;
+  u.role = u.role==='sub-admin' ? 'user' : 'sub-admin';
+  saveUser(u);
+  renderAdmin();
+}
+
+// ═══════════════════════════════════════════════════════
+//  LIGHTBOX
+// ═══════════════════════════════════════════════════════
+function openLightbox(src) {
+  document.getElementById('lightbox-img').src = src;
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+}
+
+// ═══════════════════════════════════════════════════════
+//  MODALS
+// ═══════════════════════════════════════════════════════
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+// ═══════════════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════════════
+function uid() { return Date.now().toString(36) + Math.random().toString(36).substr(2,5); }
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function formatDate(ts) {
+  const d = new Date(ts);
+  const now = new Date();
+  const diff = now - d;
+  if (diff < 60000) return '방금 전';
+  if (diff < 3600000) return `${Math.floor(diff/60000)}분 전`;
+  if (diff < 86400000) return `${Math.floor(diff/3600000)}시간 전`;
+  return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+}
+function avatarEl(user, size) {
+  if (user.avatar) return `<img src="${user.avatar}" alt="" style="width:${size};height:${size};object-fit:cover;border-radius:50%;">`;
+  return `<span style="width:${size};height:${size};display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--primary);font-size:calc(${size} * 0.4);">${(user.nick||user.id||'?')[0].toUpperCase()}</span>`;
+}
+function emptyState(title, desc) {
+  return `<div class="empty-state">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg>
+    <h3>${title}</h3><p>${desc}</p>
+  </div>`;
+}
+
+// Override switchPage for admin
+const _origSwitch = switchPage;
+window.switchPage = function(page) {
+  if (page === 'admin') {
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+    document.getElementById('page-admin').classList.add('active');
+    document.getElementById('top-bar-title').textContent = '관리자 설정';
+    document.getElementById('top-logo').style.display = 'none';
+    currentPage = 'admin';
+    renderAdmin();
+    return;
+  }
+  _origSwitch(page);
+};
+
+// ═══════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════
+initDB();
+</script>
+</body>
+  </html>
